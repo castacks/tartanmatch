@@ -52,21 +52,16 @@ from tartanmatch import TartanMatch
 model = TartanMatch.from_pretrained("checkpoints/tartanmatch_v1.safetensors", device="cuda")
 
 asset = "examples/assets/oldbrickhouseday"
-read_rgb = lambda name: cv2.cvtColor(cv2.imread(f"{asset}/{name}"), cv2.COLOR_BGR2RGB).transpose(2, 0, 1)
-rgb = read_rgb("rgb.png")                      # (3, H, W) uint8
-thermal = read_rgb("thermal.png")              # (3, H, W) uint8
-lidar = np.load(f"{asset}/lidar.npy")[None]    # (1, H, W) float32 metric depth, 0 = no return
-events = np.load(f"{asset}/events.npy")        # (N, 4) raw events [t, x, y, polarity]
+rgb = cv2.cvtColor(cv2.imread(f"{asset}/rgb.png"), cv2.COLOR_BGR2RGB).transpose(2, 0, 1)  # (3, H, W) uint8
+events = np.load(f"{asset}/events.npy")  # (N, 4) raw events [t, x, y, polarity]
 
 out = model.predict(rgb, "rgb", events, "event", event_resolution=(640, 640))
 flow = out.flow[0]                 # (2, H, W): target pixel = source pixel + flow
 covisibility = out.covisibility[0] # (H, W) in [0, 1]
-
-# Any modality can be the source or the target:
-out = model.predict(lidar, "lidar", thermal, "thermal")
 ```
 
-Any of the five modalities can be the source or the target. `predict` accepts arbitrary (and different)
+Any of the five modalities can be the source or the target; see [`examples/README.md`](examples/README.md)
+for loading each one. `predict` accepts arbitrary (and different)
 source / target sizes; inputs are resized to the model resolution internally and the flow is returned in
 the original pixel units of the source and target images.
 
