@@ -1,4 +1,9 @@
-# TartanMatch
+# TartanMatch: Towards Universal Dense Correspondence Across Modalities
+
+Hyeokjoon Kwon\*, Jiting Cai\*, Ruogu Li\*, Kritan Bhandari, Geethika Hemkumar, Parv Maheshwari, Yuheng Qiu,
+Yuchen Zhang, Sebastian Scherer, Wenshan Wang (\* equal contribution)
+
+**AirLab, Carnegie Mellon University**
 
 Dense correspondence between any two views captured in **RGB, depth, thermal, LiDAR, or event** modalities.
 Given a source view and a target view (same or different modality), TartanMatch predicts, for every source
@@ -126,11 +131,24 @@ TartanMatch builds on [UFM](https://github.com/UniFlowMatch/UFM), [UniCeption](h
 
 ## Citation
 
+If you use TartanMatch, please cite:
+
 ```bibtex
-@inproceedings{zhang2025ufm,
+@article{kwon2026tartanmatch,
+ title={TartanMatch: Towards Universal Dense Correspondence Across Modalities},
+ author={Kwon, Hyeokjoon and Cai, Jiting and Li, Ruogu and Bhandari, Kritan and Hemkumar, Geethika and Maheshwari, Parv and Qiu, Yuheng and Zhang, Yuchen and Scherer, Sebastian and Wang, Wenshan},
+ journal={arXiv preprint},
+ year={2026}
+}
+```
+
+TartanMatch builds on UFM; please consider citing it as well:
+
+```bibtex
+@article{zhang2025ufm,
  title={UFM: A Simple Path towards Unified Dense Correspondence with Flow},
  author={Zhang, Yuchen and Keetha, Nikhil and Lyu, Chenwei and Jhamb, Bhuvan and Chen, Yutian and Qiu, Yuheng and Karhade, Jay and Jha, Shreyas and Hu, Yaoyu and Ramanan, Deva and Scherer, Sebastian and Wang, Wenshan},
- booktitle={arXiv},
+ journal={arXiv preprint arXiv:2506.09278},
  year={2025}
 }
 ```
