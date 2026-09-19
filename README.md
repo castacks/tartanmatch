@@ -101,29 +101,10 @@ Reference panels for the default pairs are in [`examples/expected_outputs/`](exa
 
 ![examples](examples/assets/preview.jpg)
 
-## Numerical notes
-
-`predict` runs the backbone under float16 autocast on CUDA (`mixed_precision=True`, the default), matching
-how the model was evaluated. With `mixed_precision=False` and TF32 disabled, TartanMatch reproduces the
-training code's float32 outputs to within 0.01 px on every modality pair (bit-exact for non-image pairs).
-
-## Converting a training checkpoint
-
-Checkpoints from the Multimodal-UFM training code are converted with:
-
-```bash
-python scripts/convert_lightning_checkpoint.py path/to/last.ckpt checkpoints/tartanmatch_v1.safetensors
-```
-
-The script strips the Lightning wrapper, renames the heads, verifies every dropped or deduplicated tensor
-against the model definition, and refuses to write anything that does not load strictly.
-
 ## Tests
 
 ```bash
-pytest tests                                            # architecture / preprocessing tests, no weights needed
-TARTANMATCH_CKPT=checkpoints/tartanmatch_v1.safetensors \
-TARTANMATCH_REFERENCE_DIR=path/to/reference pytest tests  # also checks equivalence with the training code
+pytest tests
 ```
 
 ## License

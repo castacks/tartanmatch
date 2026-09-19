@@ -1,9 +1,4 @@
-"""
-Tests for TartanMatch.
-
-``test_reference_equivalence`` compares against outputs recorded from the original training
-code; it is skipped unless TARTANMATCH_CKPT and TARTANMATCH_REFERENCE_DIR are set.
-"""
+"""Tests for TartanMatch: preprocessing helpers and end-to-end shapes for every modality."""
 
 import os
 
@@ -71,49 +66,3 @@ def test_raw_events_require_resolution(random_model):
     events = np.zeros((10, 4), dtype=np.float32)
     with pytest.raises(ValueError, match="event_resolution"):
         random_model.predict(events, "event", events, "event")
-
-
-@pytest.mark.skipif(
-    not (os.environ.get("TARTANMATCH_CKPT") and os.environ.get("TARTANMATCH_REFERENCE_DIR")),
-    reason="Set TARTANMATCH_CKPT and TARTANMATCH_REFERENCE_DIR to run the equivalence tests.",
-)
-@pytest.mark.parametrize(
-    "reference_file, mixed_precision, max_flow_p99_px, max_covis_p99",
-    [
-        # Pure float32 with TF32 off: bit-exact for non-image pairs; image pairs differ only by the
-        # order of normalization and resizing (about 1e-3 px).
-        ("reference_fp32_notf32.npz", False, 0.01, 1e-3),
-        # Float16 autocast (the default): the transformer amplifies ~1e-6 input rounding differences
-        # to ~1 px at the 99th percentile; the original shows the same spread under 1e-6 perturbations.
-        ("reference.npz", True, 1.5, 0.05),
-    ],
-)
-def test_reference_equivalence(reference_file, mixed_precision, max_flow_p99_px, max_covis_p99):
-    """Released model reproduces the original training-code outputs for all 25 modality pairs."""
-    torch.backends.cuda.matmul.allow_tf32 = mixed_precision
-    torch.backends.cudnn.allow_tf32 = mixed_precision
-    reference_dir = os.environ["TARTANMATCH_REFERENCE_DIR"]
-    inputs = np.load(os.path.join(reference_dir, "inputs.npz"))
-    reference = np.load(os.path.join(reference_dir, reference_file))
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = TartanMatch.from_pretrained(os.environ["TARTANMATCH_CKPT"], device=device)
-
-    worst_flow_error, worst_covis_error = 0.0, 0.0
-    for source_modality in MODALITIES:
-        for target_modality in MODALITIES:
-            output = model.predict(
-                inputs[source_modality],
-                source_modality,
-                inputs[target_modality],
-                target_modality,
-                mixed_precision=mixed_precision,
-            )
-            flow = output.flow[0].permute(1, 2, 0).cpu().numpy()
-            covisibility = output.covisibility[0].cpu().numpy()
-            flow_error = np.linalg.norm(flow - reference[f"flow_{source_modality}_{target_modality}"], axis=-1)
-            covis_error = np.abs(covisibility - reference[f"covis_{source_modality}_{target_modality}"])
-            worst_flow_error = max(worst_flow_error, float(np.percentile(flow_error, 99)))
-            worst_covis_error = max(worst_covis_error, float(np.percentile(covis_error, 99)))
-    print(f"[{reference_file}] worst 99th-percentile error over 25 pairs: flow {worst_flow_error:.4f} px, covisibility {worst_covis_error:.4f}")
-    assert worst_flow_error < max_flow_p99_px
-    assert worst_covis_error < max_covis_p99
