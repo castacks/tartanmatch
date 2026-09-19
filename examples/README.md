@@ -63,4 +63,16 @@ is exercised as both source and target. Each run writes `examples/outputs/<sourc
 source view in its native modality | colour-coded flow | target RGB warped into the source frame (black where the model predicts
 the source pixel is not visible in the target).
 
-![preview](assets/preview.jpg)
+## Expected results
+
+`expected_outputs/` holds downscaled panels from the default run (source in its native modality | predicted
+flow | target RGB warped into the source frame, black = predicted not covisible). Your `examples/outputs/`
+should look the same up to float16 rounding.
+
+| pair | expected panel |
+|---|---|
+| rgb → event | ![](expected_outputs/rgb_to_event.jpg) |
+| event → depth | ![](expected_outputs/event_to_depth.jpg) |
+| depth → thermal | ![](expected_outputs/depth_to_thermal.jpg) |
+| thermal → lidar | ![](expected_outputs/thermal_to_lidar.jpg) |
+| lidar → rgb | ![](expected_outputs/lidar_to_rgb.jpg) |

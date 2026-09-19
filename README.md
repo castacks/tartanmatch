@@ -85,6 +85,7 @@ python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors --pa
 
 Each pair produces `examples/outputs/<source>_to_<target>.png`: the source view in its native modality, colour-coded flow, and the
 target frame warped into the source frame (black where the model predicts the pixel is not covisible).
+Reference panels for the default pairs are in [`examples/expected_outputs/`](examples/expected_outputs/).
 
 ![examples](examples/assets/preview.jpg)
 
