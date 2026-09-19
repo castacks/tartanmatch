@@ -1,9 +1,7 @@
 # TartanMatch: Towards Universal Dense Correspondence Across Modalities
 
-Hyeokjoon Kwon\*, Jiting Cai\*, Ruogu Li\*, Kritan Bhandari, Geethika Hemkumar, Parv Maheshwari, Yuheng Qiu,
-Yuchen Zhang, Sebastian Scherer, Wenshan Wang (\* equal contribution)
-
-**AirLab, Carnegie Mellon University**
+Hyeokjoon Kwon, Jiting Cai, Ruogu Li, Kritan Bhandari, Geethika Hemkumar, Parv Maheshwari, Yuheng Qiu,
+Yuchen Zhang, Sebastian Scherer, Wenshan Wang
 
 Dense correspondence between any two views captured in **RGB, depth, thermal, LiDAR, or event** modalities.
 Given a source view and a target view (same or different modality), TartanMatch predicts, for every source
