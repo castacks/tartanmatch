@@ -12,8 +12,8 @@ image space by a small learned projection, so a single network serves all 25 mod
 ## Installation
 
 ```bash
-git clone https://github.com/castacks/tartanmatch.git
-cd tartanmatch
+git clone https://github.com/castacks/TartanMatch.git
+cd TartanMatch
 pip install -e .            # core: torch, numpy, safetensors, huggingface_hub
 pip install -e ".[demo]"    # adds opencv-python, matplotlib for the example script
 ```
@@ -28,30 +28,34 @@ fine-tuned encoder).
 |---|---|---|
 | `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 441.5M |
 
-Download it from the [GitHub release](https://github.com/castacks/tartanmatch/releases) into `checkpoints/`,
+Download it from the [GitHub release](https://github.com/castacks/TartanMatch/releases) into `checkpoints/`,
 or pass a Hugging Face Hub repo id to `from_pretrained` once the weights are hosted there.
 
 ## Quick start
 
 ```python
-import cv2, numpy as np, torch
+import cv2, numpy as np
 from tartanmatch import TartanMatch
 
 model = TartanMatch.from_pretrained("checkpoints/tartanmatch_v1.safetensors", device="cuda")
 
-rgb = cv2.cvtColor(cv2.imread("examples/assets/oldbrickhouseday/rgb.png"), cv2.COLOR_BGR2RGB)
-depth = np.load("examples/assets/oldbrickhouseday/depth.npy")  # (H, W) float32 metric depth
+asset = "examples/assets/oldbrickhouseday"
+read_rgb = lambda name: cv2.cvtColor(cv2.imread(f"{asset}/{name}"), cv2.COLOR_BGR2RGB).transpose(2, 0, 1)
+rgb = read_rgb("rgb.png")                      # (3, H, W) uint8
+thermal = read_rgb("thermal.png")              # (3, H, W) uint8
+lidar = np.load(f"{asset}/lidar.npy")[None]    # (1, H, W) float32 metric depth, 0 = no return
+events = np.load(f"{asset}/events.npy")        # (N, 4) raw events [t, x, y, polarity]
 
-output = model.predict(
-    rgb.transpose(2, 0, 1), "rgb",        # source: (3, H, W) uint8
-    depth[None], "depth",                 # target: (1, H, W) float32
-)
-flow = output.flow[0]                 # (2, H, W): target pixel = source pixel + flow
-covisibility = output.covisibility[0] # (H, W) in [0, 1]
+out = model.predict(rgb, "rgb", events, "event", event_resolution=(640, 640))
+out = model.predict(lidar, "lidar", thermal, "thermal")
+
+flow = out.flow[0]                 # (2, H, W): target pixel = source pixel + flow
+covisibility = out.covisibility[0] # (H, W) in [0, 1]
 ```
 
-`predict` accepts arbitrary (and different) source / target sizes; inputs are resized to the model
-resolution internally and the flow is returned in the original pixel units of the source and target images.
+Any of the five modalities can be the source or the target. `predict` accepts arbitrary (and different)
+source / target sizes; inputs are resized to the model resolution internally and the flow is returned in
+the original pixel units of the source and target images.
 
 ### Input formats
 
@@ -67,17 +71,22 @@ A leading batch dimension is optional for every modality. Depth and LiDAR are no
 (percentile-scaled log depth), so any consistent metric unit works. Raw events are voxelized with
 `tartanmatch.preprocess.events_to_voxel_grid` (trilinear splatting into 15 temporal bins).
 
-## Example
-
-```bash
-python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors
-python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors --pairs rgb:event thermal:lidar
-```
+## Examples
 
 `examples/assets/oldbrickhouseday/` holds five consecutive frames of one TartanAir-V2 trajectory, each in a
-different modality. The script predicts every ordered pair and writes `examples/outputs/<src>_to_<tgt>.png`
-panels showing the source frame, the colour-coded flow, and the target frame warped into the source frame
-(masked by predicted covisibility).
+different modality, so every pair of frames is a cross-modal matching problem. See
+[`examples/README.md`](examples/README.md) for how each modality is loaded.
+
+```bash
+python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors                    # rgb→event, event→depth, depth→thermal, thermal→lidar, lidar→rgb
+python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors --all              # all 20 cross-modality pairs
+python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors --pairs rgb:lidar event:thermal
+```
+
+Each pair produces `examples/outputs/<source>_to_<target>.png`: the source view in its native modality, colour-coded flow, and the
+target frame warped into the source frame (black where the model predicts the pixel is not covisible).
+
+![examples](examples/assets/preview.jpg)
 
 ## Numerical notes
 
