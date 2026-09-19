@@ -1,0 +1,126 @@
+# TartanMatch
+
+Dense correspondence between any two views captured in **RGB, depth, thermal, LiDAR, or event** modalities.
+Given a source view and a target view (same or different modality), TartanMatch predicts, for every source
+pixel, the matching target pixel (optical flow) and the probability that the pixel is visible in the target
+(covisibility).
+
+TartanMatch is the multimodal successor of [UFM](https://uniflowmatch.github.io/): a shared DINOv2 encoder,
+a multi-view global-attention transformer, and DPT heads. Each non-RGB modality is mapped into the encoder's
+image space by a small learned projection, so a single network serves all 25 modality pairs.
+
+## Installation
+
+```bash
+git clone https://github.com/castacks/tartanmatch.git
+cd tartanmatch
+pip install -e .            # core: torch, numpy, safetensors, huggingface_hub
+pip install -e ".[demo]"    # adds opencv-python, matplotlib for the example script
+```
+
+The DINOv2 architecture definition is fetched once from `facebookresearch/dinov2` through `torch.hub`
+(code only; no DINOv2 weights are downloaded because the TartanMatch checkpoint already contains the
+fine-tuned encoder).
+
+## Checkpoint
+
+| Name | Description | Params |
+|---|---|---|
+| `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 441.5M |
+
+Download it from the [GitHub release](https://github.com/castacks/tartanmatch/releases) into `checkpoints/`,
+or pass a Hugging Face Hub repo id to `from_pretrained` once the weights are hosted there.
+
+## Quick start
+
+```python
+import cv2, numpy as np, torch
+from tartanmatch import TartanMatch
+
+model = TartanMatch.from_pretrained("checkpoints/tartanmatch_v1.safetensors", device="cuda")
+
+rgb = cv2.cvtColor(cv2.imread("examples/assets/oldbrickhouseday/rgb.png"), cv2.COLOR_BGR2RGB)
+depth = np.load("examples/assets/oldbrickhouseday/depth.npy")  # (H, W) float32 metric depth
+
+output = model.predict(
+    rgb.transpose(2, 0, 1), "rgb",        # source: (3, H, W) uint8
+    depth[None], "depth",                 # target: (1, H, W) float32
+)
+flow = output.flow[0]                 # (2, H, W): target pixel = source pixel + flow
+covisibility = output.covisibility[0] # (H, W) in [0, 1]
+```
+
+`predict` accepts arbitrary (and different) source / target sizes; inputs are resized to the model
+resolution internally and the flow is returned in the original pixel units of the source and target images.
+
+### Input formats
+
+| Modality | Format passed to `predict` |
+|---|---|
+| `rgb` | `(3, H, W)` uint8, or float in [0, 1] |
+| `thermal` | `(3, H, W)` uint8 (grayscale thermal replicated or false-colour), or float in [0, 1] |
+| `depth` | `(1, H, W)` float32 metric depth, 0 where invalid |
+| `lidar` | `(1, H, W)` float32 LiDAR depth projected into the camera, 0 where there is no return |
+| `event` | `(15, H, W)` float32 voxel grid, **or** raw events `(N, 4)` float `[timestamp, x, y, polarity]` with `event_resolution=(H, W)` |
+
+A leading batch dimension is optional for every modality. Depth and LiDAR are normalized per sample
+(percentile-scaled log depth), so any consistent metric unit works. Raw events are voxelized with
+`tartanmatch.preprocess.events_to_voxel_grid` (trilinear splatting into 15 temporal bins).
+
+## Example
+
+```bash
+python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors
+python examples/demo.py --checkpoint checkpoints/tartanmatch_v1.safetensors --pairs rgb:event thermal:lidar
+```
+
+`examples/assets/oldbrickhouseday/` holds five consecutive frames of one TartanAir-V2 trajectory, each in a
+different modality. The script predicts every ordered pair and writes `examples/outputs/<src>_to_<tgt>.png`
+panels showing the source frame, the colour-coded flow, and the target frame warped into the source frame
+(masked by predicted covisibility).
+
+## Numerical notes
+
+`predict` runs the backbone under float16 autocast on CUDA (`mixed_precision=True`, the default), matching
+how the model was evaluated. With `mixed_precision=False` and TF32 disabled, TartanMatch reproduces the
+training code's float32 outputs to within 0.01 px on every modality pair (bit-exact for non-image pairs).
+
+## Converting a training checkpoint
+
+Checkpoints from the Multimodal-UFM training code are converted with:
+
+```bash
+python scripts/convert_lightning_checkpoint.py path/to/last.ckpt checkpoints/tartanmatch_v1.safetensors
+```
+
+The script strips the Lightning wrapper, renames the heads, verifies every dropped or deduplicated tensor
+against the model definition, and refuses to write anything that does not load strictly.
+
+## Tests
+
+```bash
+pytest tests                                            # architecture / preprocessing tests, no weights needed
+TARTANMATCH_CKPT=checkpoints/tartanmatch_v1.safetensors \
+TARTANMATCH_REFERENCE_DIR=path/to/reference pytest tests  # also checks equivalence with the training code
+```
+
+## License
+
+The code is released under the [BSD-3-Clause license](LICENSE). The model weights inherit the licenses of
+the training datasets and may not be used for commercial purposes.
+
+## Acknowledgements
+
+TartanMatch builds on [UFM](https://github.com/UniFlowMatch/UFM), [UniCeption](https://github.com/castacks/UniCeption),
+[DINOv2](https://github.com/facebookresearch/dinov2), and [DUSt3R](https://github.com/naver/dust3r).
+
+## Citation
+
+```bibtex
+@inproceedings{zhang2025ufm,
+ title={UFM: A Simple Path towards Unified Dense Correspondence with Flow},
+ author={Zhang, Yuchen and Keetha, Nikhil and Lyu, Chenwei and Jhamb, Bhuvan and Chen, Yutian and Qiu, Yuheng and Karhade, Jay and Jha, Shreyas and Hu, Yaoyu and Ramanan, Deva and Scherer, Sebastian and Wang, Wenshan},
+ booktitle={arXiv},
+ year={2025}
+}
+```

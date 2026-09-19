@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tartanmatch"
+version = "1.0.0"
+description = "TartanMatch: dense correspondence across RGB, depth, thermal, LiDAR, and event views"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "BSD-3-Clause" }
+authors = [{ name = "AirLab, Carnegie Mellon University" }]
+keywords = ["computer-vision", "optical-flow", "dense-correspondence", "multimodal", "event-camera", "thermal", "lidar"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.1",
+    "torchvision",
+    "numpy",
+    "safetensors",
+    "huggingface_hub",
+]
+
+[project.optional-dependencies]
+demo = ["opencv-python", "flow_vis", "matplotlib"]
+dev = ["pytest", "black", "isort"]
+
+[project.urls]
+Repository = "https://github.com/castacks/tartanmatch"
+
+[tool.setuptools.packages.find]
+include = ["tartanmatch*"]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
