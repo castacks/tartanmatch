@@ -39,13 +39,13 @@ model = TartanMatch.from_pretrained("checkpoints/tartanmatch_v1.safetensors", de
 Any two entries can be matched in either direction; pass `event_resolution=(H, W)` whenever raw events are used:
 
 ```python
-out = model.predict(inputs["rgb"], "rgb", inputs["event"], "event", event_resolution=(640, 640))
-out = model.predict(inputs["lidar"], "lidar", inputs["thermal"], "thermal")
-out = model.predict(inputs["event"], "event", inputs["depth"], "depth", event_resolution=(640, 640))
+rgb_to_event = model.predict(inputs["rgb"], "rgb", inputs["event"], "event", event_resolution=(640, 640))
+lidar_to_thermal = model.predict(inputs["lidar"], "lidar", inputs["thermal"], "thermal")
+event_to_depth = model.predict(inputs["event"], "event", inputs["depth"], "depth", event_resolution=(640, 640))
 ```
 
-`out.flow[0]` is `(2, H, W)`: source pixel `(x, y)` matches target pixel `(x + flow[0], y + flow[1])`.
-`out.covisibility[0]` is `(H, W)` in `[0, 1]`.
+Each result has `.flow[0]`, a `(2, H, W)` tensor where source pixel `(x, y)` matches target pixel
+`(x + flow[0], y + flow[1])`, and `.covisibility[0]`, an `(H, W)` tensor in `[0, 1]`.
 
 If you already have an event voxel grid, pass it as a `(15, H, W)` float32 array instead of raw events; the
 conversion used internally is `tartanmatch.preprocess.events_to_voxel_grid`.

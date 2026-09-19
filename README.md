@@ -59,10 +59,11 @@ lidar = np.load(f"{asset}/lidar.npy")[None]    # (1, H, W) float32 metric depth,
 events = np.load(f"{asset}/events.npy")        # (N, 4) raw events [t, x, y, polarity]
 
 out = model.predict(rgb, "rgb", events, "event", event_resolution=(640, 640))
-out = model.predict(lidar, "lidar", thermal, "thermal")
-
 flow = out.flow[0]                 # (2, H, W): target pixel = source pixel + flow
 covisibility = out.covisibility[0] # (H, W) in [0, 1]
+
+# Any modality can be the source or the target:
+out = model.predict(lidar, "lidar", thermal, "thermal")
 ```
 
 Any of the five modalities can be the source or the target. `predict` accepts arbitrary (and different)
