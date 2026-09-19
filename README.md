@@ -17,8 +17,8 @@ image space by a small learned projection, so a single network serves all 25 mod
 ## Installation
 
 ```bash
-git clone https://github.com/castacks/TartanMatch.git
-cd TartanMatch
+git clone https://github.com/castacks/tartanmatch.git
+cd tartanmatch
 pip install -e .            # core: torch, numpy, safetensors, huggingface_hub
 pip install -e ".[demo]"    # adds opencv-python, matplotlib for the example script
 ```
