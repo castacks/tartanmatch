@@ -31,8 +31,15 @@ fine-tuned encoder).
 |---|---|---|
 | `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 441.5M |
 
-Download it from the [GitHub release](https://github.com/castacks/TartanMatch/releases) into `checkpoints/`,
-or pass a Hugging Face Hub repo id to `from_pretrained` once the weights are hosted there.
+The weights are hosted on Hugging Face at `castacks/TartanMatch` (placeholder; final URL to be announced).
+Either pass the repo id directly, which downloads and caches the file:
+
+```python
+model = TartanMatch.from_pretrained("castacks/TartanMatch", device="cuda")
+```
+
+or download `tartanmatch_v1.safetensors` manually into `checkpoints/` and pass the local path, as the
+examples below do.
 
 ## Quick start
 
