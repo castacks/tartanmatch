@@ -33,7 +33,7 @@ fine-tuned encoder).
 
 | Name | Description | Params |
 |---|---|---|
-| `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 441.5M |
+| `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 428.3M |
 
 The weights are hosted on Hugging Face at [`theairlabcmu/TartanMatch`](https://huggingface.co/theairlabcmu/TartanMatch).
 Either pass the repo id directly, which downloads and caches the file:
