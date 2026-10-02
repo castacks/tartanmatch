@@ -1,5 +1,7 @@
 # TartanMatch: Towards Universal Dense Correspondence Across Modalities
 
+[**Project page**](https://tartanmatch.github.io/) | **arXiv** (coming soon) | [**Weights**](https://huggingface.co/theairlabcmu/TartanMatch)
+
 Hyeokjoon Kwon\*, Jiting Cai\*†, Ruogu Li\*, Kritan Bhandari, Geethika Hemkumar, Parv Maheshwari, Yuheng Qiu,
 Yuchen Zhang, Sebastian Scherer, Wenshan Wang
 
@@ -33,11 +35,11 @@ fine-tuned encoder).
 |---|---|---|
 | `tartanmatch_v1.safetensors` | All-modality model, ViT-L/14 encoder, 420x560 inference resolution | 441.5M |
 
-The weights are hosted on Hugging Face at `castacks/TartanMatch` (placeholder; final URL to be announced).
+The weights are hosted on Hugging Face at [`theairlabcmu/TartanMatch`](https://huggingface.co/theairlabcmu/TartanMatch).
 Either pass the repo id directly, which downloads and caches the file:
 
 ```python
-model = TartanMatch.from_pretrained("castacks/TartanMatch", device="cuda")
+model = TartanMatch.from_pretrained("theairlabcmu/TartanMatch", device="cuda")
 ```
 
 or download `tartanmatch_v1.safetensors` manually into `checkpoints/` and pass the local path, as the

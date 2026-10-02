@@ -102,7 +102,7 @@ class TartanMatch(nn.Module):
 
         Args:
             checkpoint: Local path to a ``.safetensors`` file, or a Hugging Face Hub repo id
-                (e.g. ``"castacks/tartanmatch"``) from which ``tartanmatch_v1.safetensors`` is fetched.
+                (e.g. ``"theairlabcmu/TartanMatch"``) from which ``tartanmatch_v1.safetensors`` is fetched.
             device: Device to place the model on.
             config: Architecture config matching the checkpoint.
 

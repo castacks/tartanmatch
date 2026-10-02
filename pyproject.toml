@@ -34,6 +34,7 @@ demo = ["opencv-python", "flow_vis", "matplotlib"]
 dev = ["pytest", "black", "isort"]
 
 [project.urls]
+Homepage = "https://tartanmatch.github.io/"
 Repository = "https://github.com/castacks/tartanmatch"
 
 [tool.setuptools.packages.find]
