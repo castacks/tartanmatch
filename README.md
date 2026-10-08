@@ -108,7 +108,8 @@ pytest tests
 ## License
 
 The code is released under the [BSD-3-Clause license](LICENSE). The model weights inherit the licenses of
-the training datasets and may not be used for commercial purposes.
+the training datasets and are released under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/);
+they may not be used for commercial purposes.
 
 ## Acknowledgements
 
