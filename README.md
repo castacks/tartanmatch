@@ -113,6 +113,11 @@ they may not be used for commercial purposes.
 
 ## Acknowledgements
 
+This work was supported by the Defense Science and Technology Agency (DSTA) Contract #DST000EC124000205.
+The compute for this work was provided by Bridges-2 at PSC through allocation cis220039p from the Advanced
+Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by NSF grants
+#2138259, #2138286, #2138307, #2137603, and #2138296.
+
 TartanMatch builds on [UFM](https://github.com/UniFlowMatch/UFM), [UniCeption](https://github.com/castacks/UniCeption),
 [DINOv2](https://github.com/facebookresearch/dinov2), and [DUSt3R](https://github.com/naver/dust3r).
 
