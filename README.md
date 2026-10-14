@@ -1,6 +1,6 @@
 # TartanMatch: Towards Universal Dense Correspondence Across Modalities
 
-[**Project page**](https://tartanmatch.github.io/) | **arXiv** (coming soon) | [**Weights**](https://huggingface.co/theairlabcmu/TartanMatch)
+[**Project page**](https://tartanmatch.github.io/) | [**arXiv**](https://arxiv.org/abs/2610.14513) | [**Weights**](https://huggingface.co/theairlabcmu/TartanMatch)
 
 Hyeokjoon Kwon\*, Jiting Cai\*†, Ruogu Li\*, Kritan Bhandari, Geethika Hemkumar, Parv Maheshwari, Yuheng Qiu,
 Yuchen Zhang, Sebastian Scherer, Wenshan Wang
@@ -129,8 +129,9 @@ If you use TartanMatch, please cite:
 @article{kwon2026tartanmatch,
  title={TartanMatch: Towards Universal Dense Correspondence Across Modalities},
  author={Kwon, Hyeokjoon and Cai, Jiting and Li, Ruogu and Bhandari, Kritan and Hemkumar, Geethika and Maheshwari, Parv and Qiu, Yuheng and Zhang, Yuchen and Scherer, Sebastian and Wang, Wenshan},
- journal={arXiv preprint},
- year={2026}
+ journal={arXiv preprint arXiv:2610.14513},
+ year={2026},
+ url={https://arxiv.org/abs/2610.14513}
 }
 ```
 
